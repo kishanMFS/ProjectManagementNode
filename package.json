@@ -5,7 +5,14 @@
   "scripts": {
     "start": "node dist/index.js",
     "build": "tsc",
-    "dev": "ts-node src/index.ts"
+    "dev": "ts-node src/index.ts",
+    "lint": "eslint . --ext .ts,.tsx",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": "eslint --fix",
+    "*.{css,scss}": "stylelint --fix",
+    "*.md": "prettier --write"
   },
   "dependencies": {
     "express": "^5.2.1"
