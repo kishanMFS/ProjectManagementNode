@@ -7,9 +7,12 @@
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "rewriteRelativeImportExtensions":true,
     "module": "nodenext",
-    "target": "esnext",
-    "types": ["node"],
+    "target": "es2020",
+    "types": ["module", "node", "jest", "express", "cors"],
     // For nodejs:
     // "lib": ["esnext"],
     // "types": ["node"],
@@ -31,16 +34,17 @@
     // "noUnusedParameters": true,
     // "noFallthroughCasesInSwitch": true,
     // "noPropertyAccessFromIndexSignature": true,
+    "allowSyntheticDefaultImports": true,
 
     // Recommended Options
     "strict": true,
-    "jsx": "react-jsx",
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
+    "moduleResolution": "nodenext",
     "skipLibCheck": true,
   },
-  "include": ["src"],
+  "include": ["src/**/*", "jest.config.ts"],
   "exclude": ["node_modules", "dist"]
 }
