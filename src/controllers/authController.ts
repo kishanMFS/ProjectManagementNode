@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import * as authService from '../services/authService.js';
+import * as authService from '../services/authService';
 
 export const loginUser = async (req: Request, res: Response): Promise<void> => {
   const { username, password } = req.body;

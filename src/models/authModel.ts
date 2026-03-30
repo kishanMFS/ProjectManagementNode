@@ -1,0 +1,17 @@
+import db from '@/utils/db';
+import type { User } from '@/types/userTypes';
+
+export const findUserByEmail = async (emailId: string): Promise<User | null> => {
+  const user = await db.oneOrNone<User>(
+    `   SELECT  * 
+            FROM    tbl_users 
+            WHERE   1=1
+                    AND email_id = $1
+                    AND is_active = true
+                    AND is_deleted = false
+        `,
+    [emailId]
+  );
+
+  return user;
+};
