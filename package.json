@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node dist/server.js",
     "build": "tsc",
-    "dev": "nodemon --watch . --ext ts,js,json --exec  tsx src/server.ts",
+    "dev": "cls && nodemon --watch . --ext ts,js,json --exec  tsx src/server.ts",
     "lint": "eslint . --ext .ts,.tsx",
     "prepare": "husky",
     "test": "jest"
