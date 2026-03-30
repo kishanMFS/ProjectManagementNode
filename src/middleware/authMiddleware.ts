@@ -10,18 +10,15 @@ const authenticateToken = (req: Request, res: Response, next: NextFunction): voi
     res.status(401).json({ message: 'No token provided' });
     return;
   }
-  try {
-    jwt.verify(token, JWT_SECRET, (err, user) => {
-      if (err) {
-        res.status(403).json({ message: 'Invalid token' });
-        return;
-      }
-      req.user = user;
-      next();
-    });
-  } catch (error) {
-    res.status(500).json({ message: 'Error authenticating token', error });
-  }
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) {
+      res.status(403).json({ message: 'Invalid token' });
+      return;
+    }
+    req.body.user = user;
+    next();
+  });
 };
 
 export default authenticateToken;

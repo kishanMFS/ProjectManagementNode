@@ -29,9 +29,10 @@ export default [
     },
     rules: {
       "prettier/prettier": "error",
+      "no-unused-vars": "off", // Disable base rule
       "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
-      "@typescript-eslint/explicit-module-boundary-types": "off"
-    }
-    
+      "@typescript-eslint/explicit-module-boundary-types": "off",
+      "quotes": ["error", "single", { "allowTemplateLiterals": true, "avoidEscape": true }]
+    },    
   }
 ];
