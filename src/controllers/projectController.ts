@@ -19,10 +19,10 @@ export const getProjects = async (req: Request, res: Response): Promise<void> =>
     const getProjectsResult = await projectService.getProjectsService();
 
     res.status(200).json(getProjectsResult);
-  } catch (error) {
+  } catch (error: unknown) {
     let errorMessage = 'Error fetching projects';
     if (!isProd) {
-      errorMessage = error.message;
+      errorMessage = (error as Error).message;
     }
     res.status(500).json({ message: 'Error fetching projects', errorMessage });
   }
@@ -38,8 +38,12 @@ export const getProjectById = async (req: Request, res: Response): Promise<void>
       return;
     }
     res.status(200).json(project);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching project', error });
+  } catch (error: unknown) {
+    let errorMessage = 'Error fetching project';
+    if (!isProd) {
+      errorMessage = (error as Error).message;
+    }
+    res.status(500).json({ message: 'Error fetching project', errorMessage });
   }
 };
 
@@ -51,8 +55,12 @@ export const updateProject = async (req: Request<Project>, res: Response): Promi
       return;
     }
     res.status(200).json(project);
-  } catch (error) {
-    res.status(500).json({ message: 'Error updating project', error });
+  } catch (error: unknown) {
+    let errorMessage = 'Error updating project';
+    if (!isProd) {
+      errorMessage = (error as Error).message;
+    }
+    res.status(500).json({ message: 'Error updating project', errorMessage });
   }
 };
 
@@ -64,7 +72,11 @@ export const deleteProject = async (req: Request<Project>, res: Response): Promi
       return;
     }
     res.status(200).json({ message: 'Project deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ message: 'Error deleting project', error });
+  } catch (error: unknown) {
+    let errorMessage = 'Error deleting project';
+    if (!isProd) {
+      errorMessage = (error as Error).message;
+    }
+    res.status(500).json({ message: 'Error deleting project', errorMessage });
   }
 };
