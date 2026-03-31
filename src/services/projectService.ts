@@ -1,3 +1,5 @@
+import type { Project } from '@/types/projectTypes.js';
+
 const projects = [
   {
     id: '1',
@@ -11,10 +13,9 @@ const projects = [
   },
 ];
 
-export const createProject = async (projectData: any) => {
-  const newProject = { id: (projects.length + 1).toString(), ...projectData };
-  projects.push(newProject);
-  return newProject;
+export const createProject = async (projectData: Project) => {
+  projects.push(projectData);
+  return projectData;
 };
 
 export const getProjects = async () => {
@@ -25,7 +26,7 @@ export const getProjectById = async (id: string) => {
   return projects.find((project) => project.id === id);
 };
 
-export const updateProject = async (id: string, projectData: any) => {
+export const updateProject = (id: string, projectData: Project): Project | null => {
   const projectIndex = projects.findIndex((project) => project.id === id);
   if (projectIndex === -1) return null;
   projects[projectIndex] = { ...projects[projectIndex], ...projectData };

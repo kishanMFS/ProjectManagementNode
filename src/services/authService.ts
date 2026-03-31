@@ -1,13 +1,14 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import type { User } from '../types/userTypes';
-import { findUserByEmail } from '../models/authModel';
+// import type { User } from '@/types/authServiceTypes.js';
+import { findUserByEmail } from '@/models/authModel.js';
+import env from '@/config/env.js';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
+const JWT_SECRET = env.JWT_SECRET;
 
 export const loginUser = async (
   emailId: string,
-  password: string
+  password: string,
 ): Promise<{ access_token: string }> => {
   const user = await findUserByEmail(emailId);
 
@@ -19,8 +20,9 @@ export const loginUser = async (
     return { access_token: '' };
   }
 
-  const token =
-    jwt.sign({ id: user.id, username: user.emailId }, JWT_SECRET, { expiresIn: '2h' }) || '';
+  const token = jwt.sign({ id: user.user_id, emailId: user.email_id }, JWT_SECRET, {
+    expiresIn: '2h',
+  });
 
   return { access_token: token };
 };

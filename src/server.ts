@@ -1,12 +1,12 @@
 import express from 'express';
 import cors from 'cors';
 import { createServer } from 'http';
-import env from './config/env';
-import errorHandler from './middleware/errorHandler';
+import env from './config/env.js';
+import errorHandler from '@/middleware/errorHandler.js';
 
 const [unexpectedRequest, addErrorToRequestLog, globalErrorHandler] = errorHandler();
-import projectRoutes from './routes/projectRoutes';
-import authRoutes from './routes/authRoutes';
+import projectRoutes from '@/routes/projectRoutes.js';
+import authRoutes from '@/routes/authRoutes.js';
 
 const app: express.Application = express();
 const PORT: string | number = env.PORT;

@@ -1,5 +1,5 @@
-import db from '@/utils/db';
-import type { User } from '@/types/userTypes';
+import db from '@/utils/db.js';
+import type { User } from '@/types/authServiceTypes.js';
 
 export const findUserByEmail = async (emailId: string): Promise<User | null> => {
   const user = await db.oneOrNone<User>(
@@ -10,7 +10,7 @@ export const findUserByEmail = async (emailId: string): Promise<User | null> => 
                     AND is_active = true
                     AND is_deleted = false
         `,
-    [emailId]
+    [emailId],
   );
 
   return user;

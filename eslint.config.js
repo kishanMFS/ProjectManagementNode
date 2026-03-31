@@ -1,38 +1,40 @@
-import tseslint from "@typescript-eslint/eslint-plugin";
-import tsParser from "@typescript-eslint/parser";
-import prettierPlugin from "eslint-plugin-prettier";
-import eslintRecommended from "@eslint/js";
-import globals from "globals";
 
-export default [
-  // Base recommended rules from ESLint
-  eslintRecommended.configs.recommended,
+import eslint from "@eslint/js";
+import tseslint from 'typescript-eslint';
+// import perfectionist from "eslint-plugin-perfectionist";
+import pluginJest from "eslint-plugin-jest";
+import { error } from "node:console";
 
-  // TypeScript plugin rules
-  {
-    files: ["**/*.ts", "**/*.tsx"],
-    languageOptions: {
-      parser: tsParser,
-      parserOptions: {
-        project: "./tsconfig.json",
-        sourceType: "module",
-        ecmaVersion: "latest"
+
+export default [    
+    eslint.configs.recommended,
+    ...tseslint.configs.recommended,
+    {
+      ignores: ['**/*.js', '**/*.jsx', 'dist/**'],
+    },
+    // TypeScript plugin rules
+    {    
+      languageOptions: {
+        parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
       },
-      globals: {
-        ...globals.node,     // Node.js globals like process, console, __dirname
-        ...globals.es2021    // ES2021 built-ins like globalThis, BigInt
-      }
-    },
+    },    
     plugins: {
-      "@typescript-eslint": tseslint,
-      prettier: prettierPlugin
+      jest: pluginJest,
     },
-    rules: {
-      "prettier/prettier": "error",
-      "no-unused-vars": "off", // Disable base rule
-      "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
-      "@typescript-eslint/explicit-module-boundary-types": "off",
-      // "quotes": ["error", "single", { "allowTemplateLiterals": true, "avoidEscape": true }]
+    files: [ "**/*.ts", "**/*.tsx" ],
+    rules : {
+      "@typescript-eslint/no-unsafe-assignment": "off",
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          "argsIgnorePattern": "^_",
+          "varsIgnorePattern": "^_"
+        }
+      ]
     },
-  }
+  },
 ];
+
+// perfectionist.configs['recommended-natural'],

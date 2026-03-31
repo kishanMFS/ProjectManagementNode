@@ -1,54 +1,19 @@
 {
-  // Visit https://aka.ms/tsconfig to read more about this file
+  "extends": "@tsconfig/node22/tsconfig.json",
   "compilerOptions": {
-    // File Layout
-    "rootDir": ".",
     "outDir": "./dist",
+    "rootDir": "./",
     "baseUrl": "./src",
     "paths": {
       "@/*": ["*"]
     },
-
-    // Environment Settings
-    // See also https://aka.ms/tsconfig/module
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "rewriteRelativeImportExtensions":true,
-    "module": "nodenext",
-    "target": "es2020",
-    "types": ["node", "jest", "express", "cors"],
-    // For nodejs:
-    // "lib": ["esnext"],
-    // "types": ["node"],
-    // and npm install -D @types/node
-
-    // Other Outputs
-    "sourceMap": true,
-    "declaration": true,
-    "declarationMap": true,
-
-    // Stricter Typechecking Options
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
-
-    // Style Options
-    // "noImplicitReturns": true,
-    // "noImplicitOverride": true,
-    // "noUnusedLocals": true,
-    // "noUnusedParameters": true,
-    // "noFallthroughCasesInSwitch": true,
-    // "noPropertyAccessFromIndexSignature": true,
-    "allowSyntheticDefaultImports": true,
-
-    // Recommended Options
-    "strict": true,
-    "verbatimModuleSyntax": true,
-    "isolatedModules": true,
-    "noUncheckedSideEffectImports": true,
-    "moduleDetection": "force",
-    "moduleResolution": "nodenext",
-    "skipLibCheck": true,
+    // "esModuleInterop": true,
   },
-  "include": ["src/**/*", "jest.config.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": [
+    "src/**/*.ts",
+    "_test_/**/*.ts",
+    "jest.config.ts",
+    "jest.env.ts"  
+  ],
+  "exclude": ["dist", "node_modules"]
 }
