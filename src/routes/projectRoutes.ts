@@ -5,16 +5,16 @@ import {
   getProjectById,
   updateProject,
   deleteProject,
-} from '../controllers/projectController.js';
+} from '@/controllers/projectController.js';
 
-import authMiddleware from '../middleware/authMiddleware.js';
+import authMiddleware from '@/middleware/authMiddleware.js';
 
 const router: Router = Router();
 
-router.post('/', authMiddleware, createProject);
-router.get('/', authMiddleware, getProjects);
-router.get('/:id', authMiddleware, getProjectById);
-router.put('/:id', authMiddleware, updateProject);
-router.delete('/:id', authMiddleware, deleteProject);
+router.post('/createProject', authMiddleware, createProject);
+router.get('/getProjects', authMiddleware, getProjects);
+router.get('/getProjectById/:id', authMiddleware, getProjectById);
+router.put('/updateProject/:id', authMiddleware, updateProject);
+router.delete('/deleteProject/:id', authMiddleware, deleteProject);
 
 export default router;

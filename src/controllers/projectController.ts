@@ -1,11 +1,14 @@
 import type { Request, Response } from 'express';
 import * as projectService from '@/services/projectService.js';
 import type { Project } from '@/types/projectTypes.js';
+import env from '@/config/env.js';
+
+const isProd = env.isProd;
 
 export const createProject = async (req: Request<Project>, res: Response): Promise<void> => {
   try {
-    const project: Project = await projectService.createProject(req.body);
-    res.status(201).json(project);
+    const createProjectResult = await projectService.createProjectService(req.body);
+    res.status(201).json(createProjectResult);
   } catch (error) {
     res.status(500).json({ message: 'Error creating project', error });
   }
@@ -13,10 +16,15 @@ export const createProject = async (req: Request<Project>, res: Response): Promi
 
 export const getProjects = async (req: Request, res: Response): Promise<void> => {
   try {
-    const projects = await projectService.getProjects();
-    res.status(200).json(projects);
+    const getProjectsResult = await projectService.getProjectsService();
+
+    res.status(200).json(getProjectsResult);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching projects', error });
+    let errorMessage = 'Error fetching projects';
+    if (!isProd) {
+      errorMessage = error.message;
+    }
+    res.status(500).json({ message: 'Error fetching projects', errorMessage });
   }
 };
 
@@ -24,7 +32,7 @@ export const getProjectById = async (req: Request, res: Response): Promise<void>
   try {
     const { id } = req.params;
     const projectId = Array.isArray(id) ? id[0] : id; // Handle case where id might be an array
-    const project: Project | null = await projectService.getProjectById(projectId);
+    const project = await projectService.getProjectByIdService(projectId);
     if (!project) {
       res.status(404).json({ message: 'Project not found' });
       return;
@@ -35,9 +43,9 @@ export const getProjectById = async (req: Request, res: Response): Promise<void>
   }
 };
 
-export const updateProject = async (req: Request, res: Response): Promise<void> => {
+export const updateProject = async (req: Request<Project>, res: Response): Promise<void> => {
   try {
-    const project = await projectService.updateProject(req.params.id, req.body);
+    const project = await projectService.updateProjectService(req.params.id, req.body);
     if (!project) {
       res.status(404).json({ message: 'Project not found' });
       return;
@@ -48,9 +56,9 @@ export const updateProject = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-export const deleteProject = async (req: Request, res: Response): Promise<void> => {
+export const deleteProject = async (req: Request<Project>, res: Response): Promise<void> => {
   try {
-    const project = await projectService.deleteProject(req.params.id);
+    const project = await projectService.deleteProjectService(req.params.id);
     if (!project) {
       res.status(404).json({ message: 'Project not found' });
       return;

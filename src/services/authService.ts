@@ -15,6 +15,8 @@ export const loginUser = async (
   if (!user) {
     return { access_token: '' };
   }
+  // bcrypt.hash('admin123', 10)
+  // password was created using bcrypt with salt rounds of 10, so we need to compare the hashed password
   const isPasswordValid = await bcrypt.compare(password, user.password);
   if (!isPasswordValid) {
     return { access_token: '' };
@@ -26,12 +28,3 @@ export const loginUser = async (
 
   return { access_token: token };
 };
-
-// Mock function to find user by username
-// const findUserByUsername = async (username: string): Promise<User | null> => {
-//   const users: User[] = [
-//     { id: '1', username: 'admin', password: await bcrypt.hash('admin123', 10) },
-//     { id: '2', username: 'john@mail.com', password: await bcrypt.hash('changeme', 10) },
-//   ];
-//   return users.find((user) => user.username === username) || null;
-// };
