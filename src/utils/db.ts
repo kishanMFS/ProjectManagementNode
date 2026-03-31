@@ -1,5 +1,5 @@
 import pgPromise from 'pg-promise';
-import env from '../config/env';
+import env from '@/config/env.js';
 
 const dbURL = env.DB_URL || '';
 
