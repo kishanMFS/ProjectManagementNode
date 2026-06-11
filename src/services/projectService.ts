@@ -1,41 +1,36 @@
-import type { Project } from '@/types/projectTypes.js';
+import type { Project, ProjectModelType } from '@/types/projectTypes.js';
+import {
+  createProject,
+  getProjects,
+  getProjectById,
+  updateProject,
+  deleteProject,
+} from '@/models/projectModel.js';
 
-const projects = [
-  {
-    id: '1',
-    name: 'Project Alpha',
-    description: 'Description for Project Alpha',
-  },
-  {
-    id: '2',
-    name: 'Project Beta',
-    description: 'Description for Project Beta',
-  },
-];
-
-export const createProject = async (projectData: Project) => {
-  projects.push(projectData);
-  return projectData;
+export const createProjectService = async (projectData: Project): Promise<ProjectModelType> => {
+  const result = await createProject(projectData);
+  return result;
 };
 
-export const getProjects = async () => {
-  return projects;
+export const getProjectsService = async (): Promise<ProjectModelType> => {
+  const result = await getProjects();
+  return result;
 };
 
-export const getProjectById = async (id: string) => {
-  return projects.find((project) => project.id === id);
+export const getProjectByIdService = async (id: string): Promise<ProjectModelType> => {
+  const result = await getProjectById(id);
+  return result;
 };
 
-export const updateProject = (id: string, projectData: Project): Project | null => {
-  const projectIndex = projects.findIndex((project) => project.id === id);
-  if (projectIndex === -1) return null;
-  projects[projectIndex] = { ...projects[projectIndex], ...projectData };
-  return projects[projectIndex];
+export const updateProjectService = async (
+  id: string,
+  projectData: Project,
+): Promise<ProjectModelType> => {
+  const result = await updateProject(id, projectData);
+  return result;
 };
 
-export const deleteProject = async (id: string) => {
-  const projectIndex = projects.findIndex((project) => project.id === id);
-  if (projectIndex === -1) return null;
-  const deletedProject = projects.splice(projectIndex, 1);
-  return deletedProject[0];
+export const deleteProjectService = async (id: string): Promise<ProjectModelType> => {
+  const result = await deleteProject(id);
+  return result;
 };
