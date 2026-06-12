@@ -30,7 +30,7 @@ export const updateProjectService = async (
   return result;
 };
 
-export const deleteProjectService = async (id: string): Promise<ProjectModelType> => {
-  const result = await deleteProject(id);
+export const deleteProjectService = async (projectID: string): Promise<ProjectModelType> => {
+  const result = await deleteProject(projectID);
   return result;
 };

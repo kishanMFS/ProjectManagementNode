@@ -7,6 +7,7 @@ const isProd = env.isProd;
 
 export const createProject = async (req: Request<Project>, res: Response): Promise<void> => {
   try {
+    console.log(req.body);
     const createProjectResult = await projectService.createProjectService(req.body);
     res.status(201).json(createProjectResult);
   } catch (error) {
@@ -66,12 +67,12 @@ export const updateProject = async (req: Request<Project>, res: Response): Promi
 
 export const deleteProject = async (req: Request<Project>, res: Response): Promise<void> => {
   try {
-    const project = await projectService.deleteProjectService(req.params.id);
+    const project = await projectService.deleteProjectService(req.params.projectID);
     if (!project) {
       res.status(404).json({ message: 'Project not found' });
       return;
     }
-    res.status(200).json({ message: 'Project deleted successfully' });
+    res.status(200).json(project);
   } catch (error: unknown) {
     let errorMessage = 'Error deleting project';
     if (!isProd) {

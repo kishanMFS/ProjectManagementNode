@@ -1,12 +1,13 @@
 interface Project {
-  id: string;
-  name: string;
+  project_id: string;
+  projectname: string;
   description?: string;
+  createddate?: Date;
 }
 
 interface ProjectModelType {
   success: boolean;
-  project: Project | null;
+  project?: Project | null;
   message: string;
 }
 

@@ -13,7 +13,8 @@
     "src/**/*.ts",
     "_test_/**/*.ts",
     "jest.config.ts",
-    "jest.env.ts"  
+    "jest.env.ts",
+    "/types/express.d.ts"
   ],
   "exclude": ["dist", "node_modules"]
 }
