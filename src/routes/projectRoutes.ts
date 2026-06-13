@@ -14,20 +14,25 @@ import {
 } from '@/controllers/projectController.js';
 
 import authMiddleware from '@/middleware/authMiddleware.js';
+import multer from 'multer';
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+});
 
 const router: Router = Router();
 
 router.post('/', authMiddleware, createProject); // create project
-router.get('/:projectID', authMiddleware, getProjectById); // get particular project details
-router.put('/:projectID', authMiddleware, updateProject); // update specific project
-router.delete('/:projectID', authMiddleware, deleteProject); // delete project
+router.get('/:project_id', authMiddleware, getProjectById); // get particular project details
+router.put('/:project_id', authMiddleware, updateProject); // update specific project
+router.delete('/:project_id', authMiddleware, deleteProject); // delete project
 router.get('/', authMiddleware, getProjects); // get all projects
 
-router.post('/:projectID/files', authMiddleware, uploadFilesToProject); // upload files to project
-router.get('/:projectID/files', authMiddleware, getProjectFiles); // list project files
-router.delete('/:projectID/files/:fileID', authMiddleware, deleteProjectFiles); // delete project files
-router.post('/:projectID/jobs/zip', authMiddleware, createZip); // create zip
-router.get('/:projectID/jobs/:jobID', authMiddleware, getJobStatus); // get Job status
-router.get('/:projectID/files/:fileName/download', authMiddleware, downloadZip); // download Zip file
+router.get('/:project_id/files', authMiddleware, getProjectFiles); // list project files
+router.post('/:project_id/files', authMiddleware, upload.array('files'), uploadFilesToProject); // upload files to project
+router.delete('/:project_id/files/:fileID', authMiddleware, deleteProjectFiles); // delete project files
+router.post('/:project_id/jobs/zip', authMiddleware, createZip); // create zip
+router.get('/:project_id/jobs/:jobID', authMiddleware, getJobStatus); // get Job status
+router.get('/:project_id/files/:fileName/download', authMiddleware, downloadZip); // download Zip file
 
 export default router;
