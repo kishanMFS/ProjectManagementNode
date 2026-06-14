@@ -1,4 +1,7 @@
 import type { Project, ProjectModelType } from '@/types/projectTypes.js';
+import fs from 'fs/promises';
+import path from 'path';
+
 import {
   createProject,
   getProjects,
@@ -7,6 +10,7 @@ import {
   deleteProject,
   getProjectFiles,
   uploadFilesToProject,
+  deleteProjectFiles,
 } from '@/models/projectModel.js';
 
 export const createProjectService = async (projectData: Project): Promise<ProjectModelType> => {
@@ -41,8 +45,6 @@ export const getProjectFilesService = async (projectID: string): Promise<Project
   const result = await getProjectFiles(projectID);
   return result;
 };
-import fs from 'fs/promises';
-import path from 'path';
 
 export const uploadFilesToProjectService = async (
   projectID: string,
@@ -91,6 +93,24 @@ export const uploadFilesToProjectService = async (
   result.message = 'Files uploaded successfully';
   result.project_id = projectID;
   result.files = uploadedFiles;
+
+  return result;
+};
+
+export const deleteProjectFilesService = async (
+  projectID: string,
+  fileID: string,
+): Promise<ProjectModelType> => {
+  const result = await deleteProjectFiles(projectID, fileID);
+
+  if (result.success) {
+    const filePath = path.join(process.cwd(), 'files', result.projectfilekey);
+    try {
+      await fs.unlink(filePath);
+    } catch (error: unknown) {
+      result.message = (error as Error).message;
+    }
+  }
 
   return result;
 };

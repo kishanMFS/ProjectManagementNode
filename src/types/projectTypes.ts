@@ -11,6 +11,7 @@ interface ProjectModelType {
   project?: Project | null;
   project_id?: number | string;
   files?: object[];
+  projectfilekey?: string;
 }
 
 export interface fileType {

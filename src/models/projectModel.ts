@@ -194,6 +194,32 @@ const uploadFilesToProject = async (
   return result;
 };
 
+const deleteProjectFiles = async (projectID: string, fileID: string) => {
+  const result = {
+    success: false,
+    message: '',
+    projectfilekey: '',
+  };
+
+  const deleteFile = await db.oneOrNone(
+    `
+      DELETE
+      FROM    tbl_projectsFiles
+      WHERE   1=1
+              AND project_id = $1
+              AND projectfileid = $2
+              RETURNING projectfilekey
+    `,
+    [projectID, fileID],
+  );
+
+  result.success = true;
+  result.message = 'Project deleted successfully';
+  result.projectfilekey = deleteFile.projectfilekey;
+
+  return result;
+};
+
 export {
   createProject,
   getProjects,
@@ -202,4 +228,5 @@ export {
   deleteProject,
   getProjectFiles,
   uploadFilesToProject,
+  deleteProjectFiles,
 };

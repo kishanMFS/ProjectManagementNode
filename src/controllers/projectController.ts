@@ -118,9 +118,25 @@ export const uploadFilesToProject = async (req: Request, res: Response): Promise
   }
 };
 
-// export const deleteProjectFiles = async (req: Request, res: Response): Promise<void> =>{
+export const deleteProjectFiles = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const projectId = req.params.project_id;
+    const fileID = req.params.fileID;
 
-// }
+    const response = await projectService.deleteProjectFilesService(projectId, fileID);
+    if (!response.success) {
+      res.status(404).json({ message: 'Project not found' });
+      return;
+    }
+    res.status(200).json(response);
+  } catch (error: unknown) {
+    let errorMessage = 'Error getting project files';
+    if (!isProd) {
+      errorMessage = (error as Error).message;
+    }
+    res.status(500).json({ message: errorMessage, errorMessage });
+  }
+};
 // export const createZip = async (req: Request, res: Response): Promise<void> =>{
 
 // }
