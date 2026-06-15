@@ -49,7 +49,10 @@ const getProjects = async () => {
 				        FROM    tbl_projectsFiles pf 
 				        WHERE   pf.project_ID = p.project_id
 				        ) AS projectFiles,
-                0 AS projectJobs
+                (SELECT count(pj.jobid)
+				        FROM    tbl_projectJobs pj 
+				        WHERE   pj.project_ID = p.project_id
+				        ) AS projectJobs
         FROM    tbl_projects p
         WHERE   1=1
                 AND p.is_deleted = false

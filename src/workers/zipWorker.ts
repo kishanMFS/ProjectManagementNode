@@ -25,13 +25,6 @@ const { files, zipPath } = workerData as WorkerData;
     let processed = 0;
     const total = files.length;
 
-    output.on('close', () => {
-      parentPort?.postMessage({
-        status: 'COMPLETED',
-        progress: 100,
-      });
-    });
-
     archive.on('error', (err) => {
       throw err;
     });
@@ -56,6 +49,19 @@ const { files, zipPath } = workerData as WorkerData;
     }
 
     await archive.finalize();
+
+    await new Promise<void>((resolve, reject) => {
+      output.on('close', () => {
+        resolve();
+      });
+
+      output.on('error', reject);
+    });
+
+    parentPort?.postMessage({
+      status: 'COMPLETED',
+      progress: 100,
+    });
   } catch (error) {
     console.log('zipworkers ', error);
 

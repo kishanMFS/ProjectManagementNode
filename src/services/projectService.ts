@@ -184,7 +184,7 @@ export const createZipService = async (
     worker.on('error', async (error) => {
       console.log('Worker error:', error);
 
-      await updateJobStatus(jobId, 'FAILED', 0, (error as Error).message);
+      await updateJobStatus(jobId, 'ERROR', 0, (error as Error).message);
     });
 
     worker.on('exit', async (code) => {
@@ -193,32 +193,6 @@ export const createZipService = async (
         await updateJobStatus(jobId, 'FAILED', 0, `Worker exited with code ${code}`);
       }
     });
-
-    // await new Promise<void>((resolve, reject) => {
-    //   const output = fsSync.createWriteStream(zipPath);
-
-    //   const archive = new archiver.ZipArchive({
-    //     zlib: { level: 9 },
-    //   });
-
-    //   output.on('close', () => resolve());
-
-    //   archive.on('error', reject);
-
-    //   archive.pipe(output);
-
-    //   files.forEach((file) => {
-    //     const filePath = path.join(process.cwd(), 'files', file.projectfilekey);
-
-    //     if (fsSync.existsSync(filePath)) {
-    //       archive.file(filePath, {
-    //         name: file.projectfilename,
-    //       });
-    //     }
-    //   });
-
-    //   archive.finalize();
-    // });
 
     result.success = true;
     result.project_id = projectID;
