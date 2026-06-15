@@ -325,7 +325,6 @@ export const updateJobStatus = async (
     message: '',
   };
 
-  console.log(status, progress);
   const updateJobStatus = await db.oneOrNone(
     `
       UPDATE  tbl_projectjobs
