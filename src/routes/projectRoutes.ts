@@ -9,7 +9,7 @@ import {
   getProjectFiles,
   deleteProjectFiles,
   createZip,
-  getJobStatus,
+  getJobsStatus,
   downloadZip,
 } from '@/controllers/projectController.js';
 
@@ -32,7 +32,8 @@ router.get('/:project_id/files', authMiddleware, getProjectFiles); // list proje
 router.post('/:project_id/files', authMiddleware, upload.array('files'), uploadFilesToProject); // upload files to project
 router.delete('/:project_id/files/:fileID', authMiddleware, deleteProjectFiles); // delete project files
 router.post('/:project_id/jobs/zip', authMiddleware, createZip); // create zip
-router.get('/:project_id/jobs/:jobID', authMiddleware, getJobStatus); // get Job status
+// router.get('/:project_id/jobs/:jobID', authMiddleware, getJobStatus); // get Job status
+router.get('/:project_id/jobs', authMiddleware, getJobsStatus); // get Jobs status
 router.get('/:project_id/files/:fileName/download', authMiddleware, downloadZip); // download Zip file
 
 export default router;

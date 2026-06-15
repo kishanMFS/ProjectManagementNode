@@ -12,6 +12,9 @@ interface ProjectModelType {
   project_id?: number | string;
   files?: object[];
   projectfilekey?: string;
+  projectfile?: object[];
+  status?: string;
+  jobs?: object[];
 }
 
 export interface fileType {

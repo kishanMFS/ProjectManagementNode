@@ -220,6 +220,94 @@ const deleteProjectFiles = async (projectID: string, fileID: string) => {
   return result;
 };
 
+const getProjectFilesByIds = async (projectID: string, fileId: number[]) => {
+  const result = {
+    success: false,
+    message: 'no files found',
+    projectfile: [],
+  };
+
+  const getFiles = await db.manyOrNone(
+    `
+      SELECT  projectfileid,
+              projectfilename,      
+              projectfilekey
+      FROM    tbl_projectsfiles
+      WHERE   project_id = $1
+              AND projectfileid = ANY($2::int[])
+    `,
+    [projectID, fileId],
+  );
+
+  if (getFiles.length) {
+    result.success = true;
+    result.message = 'Project files fetched successfully';
+    result.projectfile = getFiles.map((file) => ({
+      projectfilename: file.projectfilename,
+      projectfilekey: file.projectfilekey,
+    }));
+  }
+
+  return result;
+};
+
+const createJob = async (projectID: string, zipName: string) => {
+  const result = {
+    success: false,
+    message: 'create job error',
+    jobs: {},
+  };
+
+  const createJob = await db.oneOrNone(
+    `
+      INSERT
+      INTO    tbl_projectjobs
+              (project_id, zipname) 
+      VALUES  ($1, $2)
+              RETURNING *
+    `,
+    [projectID, zipName],
+  );
+
+  if (createJob) {
+    result.success = true;
+    result.jobs = {
+      jobid: createJob.jobid,
+      cdt: createJob.cdt,
+      status: createJob.status,
+    };
+    result.message = 'Project job created successfully';
+  }
+
+  return result;
+};
+
+const getJobsStatus = async (projectID: string) => {
+  const result = {
+    success: false,
+    jobs: [],
+    message: '',
+  };
+  const projectJobs = await db.manyOrNone(
+    `   SELECT  jobid,
+                zipname,
+                status,
+                TO_CHAR(cdt, 'DD/MM/YYYY') as uploadedDate
+        FROM    tbl_projectjobs
+        WHERE   1=1
+                AND project_id = $1
+                ORDER BY jobid DESC
+    `,
+    [projectID],
+  );
+  if (projectJobs) {
+    result.success = true;
+    result.message = 'Project jobs fetched successfully';
+    result.jobs = projectJobs;
+  }
+  return result;
+};
+
 export {
   createProject,
   getProjects,
@@ -229,4 +317,7 @@ export {
   getProjectFiles,
   uploadFilesToProject,
   deleteProjectFiles,
+  getProjectFilesByIds,
+  createJob,
+  getJobsStatus,
 };

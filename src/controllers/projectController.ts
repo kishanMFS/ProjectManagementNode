@@ -137,12 +137,43 @@ export const deleteProjectFiles = async (req: Request, res: Response): Promise<v
     res.status(500).json({ message: errorMessage, errorMessage });
   }
 };
-// export const createZip = async (req: Request, res: Response): Promise<void> =>{
+export const createZip = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const projectId = req.params.project_id;
+    const fileID = req.body.fileId;
 
-// }
-// export const getJobStatus = async (req: Request, res: Response): Promise<void> =>{
+    const response = await projectService.createZipService(projectId, fileID);
+    if (!response.success) {
+      res.status(404).json({ message: 'Project not found', errorMessage: response.message });
+      return;
+    }
+    res.status(200).json(response);
+  } catch (error: unknown) {
+    let errorMessage = 'Error getting project files';
+    if (!isProd) {
+      errorMessage = (error as Error).message;
+    }
+    res.status(500).json({ message: errorMessage, errorMessage });
+  }
+};
+export const getJobsStatus = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const projectId = req.params.project_id;
 
-// }
+    const response = await projectService.getJobsStatusService(projectId);
+    if (!response.success) {
+      res.status(404).json({ message: 'Project jobs not found', errorMessage: response.message });
+      return;
+    }
+    res.status(200).json(response);
+  } catch (error: unknown) {
+    let errorMessage = 'Error getting project jobs';
+    if (!isProd) {
+      errorMessage = (error as Error).message;
+    }
+    res.status(500).json({ message: errorMessage, errorMessage });
+  }
+};
 // export const downloadZip = async (req: Request, res: Response): Promise<void> =>{
 
 // }
