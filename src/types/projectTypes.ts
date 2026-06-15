@@ -15,6 +15,8 @@ interface ProjectModelType {
   projectfile?: object[];
   status?: string;
   jobs?: object[];
+  filePath?: string;
+  fileName?: string;
 }
 
 export interface fileType {
