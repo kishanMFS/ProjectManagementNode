@@ -2,7 +2,10 @@ import type { Project, ProjectModelType } from '@/types/projectTypes.js';
 import fs from 'fs/promises';
 import * as fsSync from 'fs';
 import path from 'path';
-import * as archiver from 'archiver';
+// import * as archiver from 'archiver';
+import env from '@/config/env.js';
+
+const isProd = env.isProd;
 
 import {
   createProject,
@@ -15,6 +18,7 @@ import {
   deleteProjectFiles,
   getProjectFilesByIds,
   createJob,
+  updateJobStatus,
   getJobsStatus,
 } from '@/models/projectModel.js';
 
@@ -120,6 +124,8 @@ export const deleteProjectFilesService = async (
   return result;
 };
 
+import { Worker } from 'worker_threads';
+
 export const createZipService = async (
   projectID: string,
   fileID: number[],
@@ -127,6 +133,9 @@ export const createZipService = async (
   const result = {
     success: false,
     message: '',
+    status: '',
+    jobid: 0,
+    project_id: '',
   };
   const getProjectFilesByIdsResult = await getProjectFilesByIds(projectID, fileID);
   try {
@@ -150,31 +159,66 @@ export const createZipService = async (
     // create a jon record
     const createJobresult = await createJob(projectID, zipName);
 
-    await new Promise<void>((resolve, reject) => {
-      const output = fsSync.createWriteStream(zipPath);
+    const jobId = createJobresult.jobs.jobid;
 
-      const archive = new archiver.ZipArchive({
-        zlib: { level: 9 },
-      });
+    const worker = new Worker(
+      path.resolve(
+        process.cwd(),
+        isProd ? 'dist/src/workers/zipWorker.ts' : 'src/workers/zipWorker.ts',
+      ),
+      {
+        workerData: {
+          projectID,
+          zipPath,
+          files,
+        },
+      },
+    );
 
-      output.on('close', () => resolve());
+    worker.on('message', async (message) => {
+      console.log('Worker message:', message);
 
-      archive.on('error', reject);
-
-      archive.pipe(output);
-
-      files.forEach((file) => {
-        const filePath = path.join(process.cwd(), 'files', file.projectfilekey);
-
-        if (fsSync.existsSync(filePath)) {
-          archive.file(filePath, {
-            name: file.projectfilename,
-          });
-        }
-      });
-
-      archive.finalize();
+      await updateJobStatus(jobId, message.status, message.progress ?? 0);
     });
+
+    worker.on('error', async (error) => {
+      console.log('Worker error:', error);
+
+      await updateJobStatus(jobId, 'FAILED', 0, (error as Error).message);
+    });
+
+    worker.on('exit', async (code) => {
+      console.log('Worker exit:', code);
+      if (code !== 0) {
+        await updateJobStatus(jobId, 'FAILED', 0, `Worker exited with code ${code}`);
+      }
+    });
+
+    // await new Promise<void>((resolve, reject) => {
+    //   const output = fsSync.createWriteStream(zipPath);
+
+    //   const archive = new archiver.ZipArchive({
+    //     zlib: { level: 9 },
+    //   });
+
+    //   output.on('close', () => resolve());
+
+    //   archive.on('error', reject);
+
+    //   archive.pipe(output);
+
+    //   files.forEach((file) => {
+    //     const filePath = path.join(process.cwd(), 'files', file.projectfilekey);
+
+    //     if (fsSync.existsSync(filePath)) {
+    //       archive.file(filePath, {
+    //         name: file.projectfilename,
+    //       });
+    //     }
+    //   });
+
+    //   archive.finalize();
+    // });
 
     result.success = true;
     result.project_id = projectID;
@@ -191,4 +235,32 @@ export const createZipService = async (
 export const getJobsStatusService = async (projectID: string): Promise<ProjectModelType> => {
   const result = await getJobsStatus(projectID);
   return result;
+};
+
+export const downloadZipService = async (
+  projectId: string,
+  fileName: string,
+): Promise<ProjectModelType> => {
+  try {
+    const filePath = path.join(process.cwd(), 'files', fileName);
+
+    if (!fsSync.existsSync(filePath)) {
+      return {
+        success: false,
+        message: 'Zip file not found',
+      };
+    }
+
+    return {
+      success: true,
+      message: 'File found',
+      filePath,
+      fileName,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: (error as Error).message,
+    };
+  }
 };

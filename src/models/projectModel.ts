@@ -292,6 +292,7 @@ const getJobsStatus = async (projectID: string) => {
     `   SELECT  jobid,
                 zipname,
                 status,
+                progress,
                 TO_CHAR(cdt, 'DD/MM/YYYY') as uploadedDate
         FROM    tbl_projectjobs
         WHERE   1=1
@@ -304,6 +305,46 @@ const getJobsStatus = async (projectID: string) => {
     result.success = true;
     result.message = 'Project jobs fetched successfully';
     result.jobs = projectJobs;
+  }
+  return result;
+};
+
+export interface UpdateJobStatusResult {
+  success: boolean;
+  message: string;
+}
+
+export const updateJobStatus = async (
+  jobId: number,
+  status: string,
+  progress = 0,
+  errorMessage?: string,
+): Promise<UpdateJobStatusResult> => {
+  const result = {
+    success: false,
+    message: '',
+  };
+
+  console.log(status, progress);
+  const updateJobStatus = await db.oneOrNone(
+    `
+      UPDATE  tbl_projectjobs
+      SET     status = $1,
+              progress = $2,
+              error_message = $3,
+              completed_at = CASE
+                              WHEN $1 IN ('COMPLETED', 'FAILED')
+                              THEN NOW()
+                              ELSE completed_at
+                            END
+      WHERE jobid = $4
+    `,
+    [status, progress, errorMessage, jobId],
+  );
+
+  if (updateJobStatus) {
+    result.success = true;
+    result.message = 'Job updated successfully';
   }
   return result;
 };

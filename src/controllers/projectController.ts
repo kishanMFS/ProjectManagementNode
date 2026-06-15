@@ -174,6 +174,33 @@ export const getJobsStatus = async (req: Request, res: Response): Promise<void> 
     res.status(500).json({ message: errorMessage, errorMessage });
   }
 };
-// export const downloadZip = async (req: Request, res: Response): Promise<void> =>{
 
-// }
+export const downloadZip = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { project_id, fileName } = req.params;
+
+    const result = await projectService.downloadZipService(project_id, fileName);
+
+    if (!result.success || !result.filePath) {
+      res.status(404).json({
+        success: false,
+        message: result.message,
+      });
+      return;
+    }
+
+    res.download(result.filePath, result.fileName, (error) => {
+      if (error && !res.headersSent) {
+        res.status(500).json({
+          success: false,
+          message: 'Failed to download file',
+        });
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: (error as Error).message,
+    });
+  }
+};
