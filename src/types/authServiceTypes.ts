@@ -13,4 +13,8 @@ interface JwtPayload {
   emailId: string;
 }
 
-export type { User, loginBody, JwtPayload };
+import type { CookieOptions } from 'express';
+
+type LoginResult = { access_token: string; cookieOptions: CookieOptions } | null;
+
+export type { User, loginBody, JwtPayload, LoginResult };

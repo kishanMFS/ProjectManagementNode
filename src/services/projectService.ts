@@ -1,4 +1,10 @@
-import type { Project, ProjectModelType } from '@/types/projectTypes.js';
+import type {
+  Project,
+  ProjectModelType,
+  ApiResponse,
+  ProjectJob,
+  UploadedFile,
+} from '@/types/projectTypes.js';
 import fs from 'fs/promises';
 import * as fsSync from 'fs';
 import path from 'path';
@@ -27,45 +33,68 @@ export const createProjectService = async (projectData: Project): Promise<Projec
   return result;
 };
 
-export const getProjectsService = async (): Promise<ProjectModelType> => {
+export const getProjectsService = async (): Promise<ApiResponse<Project[]>> => {
   const result = await getProjects();
-  return result;
+  return {
+    success: result.success,
+    message: result.message,
+    data: result.projects,
+  };
 };
 
-export const getProjectByIdService = async (id: string): Promise<ProjectModelType> => {
+export const getProjectByIdService = async (id: string): Promise<ApiResponse<Project>> => {
   const result = await getProjectById(id);
-  return result;
+  return {
+    success: result.success,
+    message: result.message,
+    data: result.project ?? undefined,
+  };
 };
 
 export const updateProjectService = async (
   id: string,
   projectData: Project,
-): Promise<ProjectModelType> => {
+): Promise<ApiResponse<Project>> => {
   const result = await updateProject(id, projectData);
   return result;
 };
 
-export const deleteProjectService = async (projectID: string): Promise<ProjectModelType> => {
+export const deleteProjectService = async (projectID: string): Promise<ApiResponse<Project>> => {
   const result = await deleteProject(projectID);
   return result;
 };
 
-export const getProjectFilesService = async (projectID: string): Promise<ProjectModelType> => {
+export const getProjectFilesService = async (projectID: string): Promise<ApiResponse> => {
   const result = await getProjectFiles(projectID);
-  return result;
+  return {
+    success: result.success,
+    message: result.message,
+    data: result.files,
+  };
 };
 
 export const uploadFilesToProjectService = async (
   projectID: string,
   files: Express.Multer.File[],
-): Promise<ProjectModelType> => {
-  const uploadedFiles = [];
+): Promise<ApiResponse> => {
+  const uploadedFiles: UploadedFile[] = [];
   const filesDir = path.join(process.cwd(), 'files');
-  const result = {
+  const result: {
+    success: boolean;
+    message: string;
+    project_id: string;
+    data: {
+      project_id: string;
+      files: UploadedFile[];
+    };
+  } = {
     success: false,
     message: '',
     project_id: projectID,
-    files: [],
+    data: {
+      project_id: '',
+      files: [],
+    },
   };
 
   await fs.mkdir(filesDir, { recursive: true });
@@ -90,18 +119,20 @@ export const uploadFilesToProjectService = async (
     );
 
     uploadedFiles.push({
-      fileId: dbResult.files.projectfileid,
+      fileId: dbResult.files!.projectfileid,
       name: file.originalname,
       size: file.size,
       type: file.mimetype,
-      cdt: dbResult.files.cdt,
+      cdt: dbResult.files!.cdt,
     });
   }
 
   result.success = true;
   result.message = 'Files uploaded successfully';
-  result.project_id = projectID;
-  result.files = uploadedFiles;
+  result.data = {
+    project_id: projectID,
+    files: uploadedFiles,
+  };
 
   return result;
 };
@@ -109,7 +140,7 @@ export const uploadFilesToProjectService = async (
 export const deleteProjectFilesService = async (
   projectID: string,
   fileID: string,
-): Promise<ProjectModelType> => {
+): Promise<ApiResponse<Project>> => {
   const result = await deleteProjectFiles(projectID, fileID);
 
   if (result.success) {
@@ -129,7 +160,7 @@ import { Worker } from 'worker_threads';
 export const createZipService = async (
   projectID: string,
   fileID: number[],
-): Promise<ProjectModelType> => {
+): Promise<ApiResponse<{ jobid: number; status: string }>> => {
   const result = {
     success: false,
     message: '',
@@ -138,6 +169,12 @@ export const createZipService = async (
     project_id: '',
   };
   const getProjectFilesByIdsResult = await getProjectFilesByIds(projectID, fileID);
+  let createJobresult = {
+    jobs: {
+      jobid: 0,
+      status: '',
+    },
+  };
   try {
     if (!getProjectFilesByIdsResult.success) {
       result.success = getProjectFilesByIdsResult.success;
@@ -157,7 +194,7 @@ export const createZipService = async (
     const zipPath = path.join(process.cwd(), 'files', zipName);
 
     // create a jon record
-    const createJobresult = await createJob(projectID, zipName);
+    createJobresult = await createJob(projectID, zipName);
 
     const jobId = createJobresult.jobs.jobid;
 
@@ -175,16 +212,22 @@ export const createZipService = async (
       },
     );
 
-    worker.on('message', async (message) => {
-      console.log('Worker message:', message);
+    let lastUpdatePromise: Promise<void> = Promise.resolve();
 
-      await updateJobStatus(jobId, message.status, message.progress ?? 0);
+    worker.on('message', (message) => {
+      lastUpdatePromise = lastUpdatePromise
+        .then(async () => {
+          await updateJobStatus(jobId, message.status, message.progress ?? 0);
+        })
+        .catch((err) => {
+          console.error('DB update failed:', err);
+        });
     });
 
     worker.on('error', async (error) => {
       console.log('Worker error:', error);
 
-      await updateJobStatus(jobId, 'FAILED', 0, (error as Error).message);
+      await updateJobStatus(jobId, 'ERROR', 0, (error as Error).message);
     });
 
     worker.on('exit', async (code) => {
@@ -193,48 +236,29 @@ export const createZipService = async (
         await updateJobStatus(jobId, 'FAILED', 0, `Worker exited with code ${code}`);
       }
     });
-
-    // await new Promise<void>((resolve, reject) => {
-    //   const output = fsSync.createWriteStream(zipPath);
-
-    //   const archive = new archiver.ZipArchive({
-    //     zlib: { level: 9 },
-    //   });
-
-    //   output.on('close', () => resolve());
-
-    //   archive.on('error', reject);
-
-    //   archive.pipe(output);
-
-    //   files.forEach((file) => {
-    //     const filePath = path.join(process.cwd(), 'files', file.projectfilekey);
-
-    //     if (fsSync.existsSync(filePath)) {
-    //       archive.file(filePath, {
-    //         name: file.projectfilename,
-    //       });
-    //     }
-    //   });
-
-    //   archive.finalize();
-    // });
-
-    result.success = true;
-    result.project_id = projectID;
-    result.jobid = createJobresult.jobs.jobid;
-    result.status = createJobresult.jobs.status;
-    result.message = 'Zip created successfully';
   } catch (error) {
     result.success = false;
     result.message = (error as Error).message;
   }
-  return result;
+  return {
+    success: true,
+    message: 'Zip created successfully',
+    data: {
+      jobid: createJobresult.jobs.jobid,
+      status: createJobresult.jobs.status,
+    },
+  };
 };
 
-export const getJobsStatusService = async (projectID: string): Promise<ProjectModelType> => {
+export const getJobsStatusService = async (
+  projectID: string,
+): Promise<ApiResponse<ProjectJob[]>> => {
   const result = await getJobsStatus(projectID);
-  return result;
+  return {
+    success: result.success,
+    message: result.message,
+    data: result.jobs,
+  };
 };
 
 export const downloadZipService = async (

@@ -10,7 +10,7 @@ export default [
     eslint.configs.recommended,
     ...tseslint.configs.recommended,
     {
-      ignores: ['**/*.js', '**/*.jsx', 'dist/**'],
+      ignores: ['**/*.js', '**/*.jsx', 'dist/**', '_test_/**'],
     },
     // TypeScript plugin rules
     {    

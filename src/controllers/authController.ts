@@ -10,7 +10,7 @@ export const loginController = async (req: Request<loginBody>, res: Response): P
     return;
   }
   const loginUserResponse = await authService.loginUser(email, password);
-  if (!loginUserResponse.access_token) {
+  if (!loginUserResponse) {
     res.status(401).json({ message: 'Invalid credentials' });
     return;
   }
