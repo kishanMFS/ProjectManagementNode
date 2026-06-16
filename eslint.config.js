@@ -7,19 +7,19 @@ import { error } from "node:console";
 
 
 export default [    
-    eslint.configs.recommended,
-    ...tseslint.configs.recommended,
-    {
-      ignores: ['**/*.js', '**/*.jsx', 'dist/**', '_test_/**'],
-    },
-    // TypeScript plugin rules
-    {    
-      languageOptions: {
-        parserOptions: {
+  eslint.configs.recommended,
+  ...tseslint.configs.recommended,
+  {
+    ignores: ['**/*.js', '**/*.jsx', 'dist/**', '_test_/**'],
+  },
+  // TypeScript plugin rules
+  {    
+    languageOptions: {
+      parserOptions: {
         projectService: true,
         tsconfigRootDir: import.meta.dirname,
       },
-    },    
+    },
     plugins: {
       jest: pluginJest,
     },
