@@ -13,7 +13,7 @@ import {
   downloadZip,
 } from '@/controllers/projectController.js';
 
-import authMiddleware from '@/middleware/authMiddleware.js';
+import authMiddleware from '../middleware/authMiddleware.js';
 import multer from 'multer';
 
 const upload = multer({
