@@ -1,5 +1,5 @@
 import db from '@/utils/db.js';
-import type { Project, fileType } from '@/types/projectTypes.js';
+import type { Project, fileType, ProjectJob } from '@/types/projectTypes.js';
 
 // import { User } from '@/types/authServiceTypes.js';
 
@@ -42,7 +42,7 @@ const getProjects = async () => {
   };
   const projects = await db.manyOrNone<Project>(
     `   SELECT  p.project_id,
-                p.project_name as projectName,
+                p.project_name as projectname,
                 p.project_description as description,
                 TO_CHAR(p.cdt, 'DD/MM/YYYY') as createdDate,
                 (SELECT count(pf.projectfileid)
@@ -93,14 +93,14 @@ const getProjectById = async (id: string) => {
   return result;
 };
 
-const updateProject = (id: string, projectData: Project) => {
+const updateProject = async (id: string, projectData: Project) => {
   const result = {
     success: false,
     project: null as Project | null,
     message: '',
   };
 
-  db.query(
+  await db.oneOrNone(
     `   
       UPDATE  tbl_projects
       SET     projectName = $1
@@ -140,7 +140,7 @@ const deleteProject = async (projectID: string) => {
 const getProjectFiles = async (projectID: string) => {
   const result = {
     success: false,
-    files: [],
+    files: {},
     message: '',
   };
   const projectsFiles = await db.manyOrNone<fileType>(
@@ -168,11 +168,28 @@ const uploadFilesToProject = async (
   filekey: string,
   mimetype: string,
   size: number,
-) => {
-  const result = {
+): Promise<{
+  success: boolean;
+  message: string;
+  files?: {
+    projectfileid: number;
+    cdt: string;
+  };
+}> => {
+  const result: {
+    success: boolean;
+    message: string;
+    files?: {
+      projectfileid: number;
+      cdt: string;
+    };
+  } = {
     success: false,
     message: '',
-    files: {},
+    files: {
+      projectfileid: 0,
+      cdt: '',
+    },
   };
 
   const insertFiles = await db.oneOrNone(
@@ -227,7 +244,7 @@ const getProjectFilesByIds = async (projectID: string, fileId: number[]) => {
   const result = {
     success: false,
     message: 'no files found',
-    projectfile: [],
+    projectfile: [{}],
   };
 
   const getFiles = await db.manyOrNone(
@@ -258,7 +275,11 @@ const createJob = async (projectID: string, zipName: string) => {
   const result = {
     success: false,
     message: 'create job error',
-    jobs: {},
+    jobs: {
+      jobid: 0,
+      status: '',
+      cdt: '',
+    },
   };
 
   const createJob = await db.oneOrNone(
@@ -286,12 +307,16 @@ const createJob = async (projectID: string, zipName: string) => {
 };
 
 const getJobsStatus = async (projectID: string) => {
-  const result = {
+  const result: {
+    success: boolean;
+    jobs: ProjectJob[];
+    message: string;
+  } = {
     success: false,
     jobs: [],
     message: '',
   };
-  const projectJobs = await db.manyOrNone(
+  const projectJobs = await db.manyOrNone<ProjectJob>(
     `   SELECT  jobid,
                 zipname,
                 status,

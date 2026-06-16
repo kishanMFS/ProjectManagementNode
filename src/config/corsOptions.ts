@@ -1,6 +1,10 @@
 import { CorsOptions } from 'cors';
 
-const whitelist: string[] = ['http://localhost:5173', 'http://localhost:4173'];
+const whitelist: string[] = [
+  'http://localhost:5173',
+  'http://localhost:4173',
+  'https://project-management-react-pi.vercel.app',
+];
 
 const corsOptions: CorsOptions = {
   origin: (origin, callback) => {

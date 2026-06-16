@@ -1,8 +1,18 @@
 import rateLimit from 'express-rate-limit';
+import env from '@/config/env.js';
+
+const isProd = env.isProd;
+let apiRateLimit = 10000;
+let authRateLimit = 10000;
+
+if (isProd) {
+  apiRateLimit = 100; // Max 100 requests per IP
+  authRateLimit = 10; // Stricter limit for login endpoint
+}
 
 export const apiRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  limit: 1000, // Max 100 requests per IP
+  limit: apiRateLimit,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
@@ -13,7 +23,7 @@ export const apiRateLimiter = rateLimit({
 
 export const authRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  limit: 10000, // Stricter limit for login endpoint
+  limit: authRateLimit,
   standardHeaders: true,
   legacyHeaders: false,
   message: {

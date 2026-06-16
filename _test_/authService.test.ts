@@ -4,6 +4,7 @@ import { loginUser } from '../src/services/authService.js';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import type { Request, Response } from 'express';
 import type { loginBody } from '../src/types/authServiceTypes.js';
+import type { LoginResult } from '../src/types/authServiceTypes.ts';
 
 const JWT_SECRET: string = process.env.JWT_SECRET || 'your_jwt_secret';
 
@@ -18,21 +19,26 @@ describe('loginUser service', () => {
       id: string;
       emailId: string;
     }
-    expect(result.access_token).not.toBe('');
+    expect(result).not.toBeNull();
+    if (!result) throw new Error('Expected loginUser to return a token');
     const decoded = jwt.verify(result.access_token, JWT_SECRET) as unknown as MyJwtPayload;
 
     expect(decoded.emailId).toBe('john@mail.com');
     // expect(decoded.id).toBe("1");
   });
 
-  it('should return empty token for invalid email', async () => {
+  it('should return null on invalid email', async () => {
     const result = await loginUser('unknown', 'admin123');
-    expect(result.access_token).toBe('');
+    // expect(result).not.toBeNull();
+
+    // if (!result) throw new Error('Expected result but got null');
+
+    expect(result).toBeNull();
   });
 
-  it('should return empty token for invalid password', async () => {
+  it('should return null on invalid password', async () => {
     const result = await loginUser('admin', 'wrongpassword');
-    expect(result.access_token).toBe('');
+    expect(result).toBeNull();
   });
 });
 
@@ -45,6 +51,7 @@ describe('Auth Controller - loginUser', () => {
     mockRes = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
+      cookie: jest.fn(),
     };
   });
 
@@ -62,11 +69,14 @@ describe('Auth Controller - loginUser', () => {
     });
   });
 
+  type LoginSuccess = Exclude<LoginResult, null>;
+
   it('should return 200 and token for valid credentials', async () => {
-    mockReq.body = { emailId: 'john@mail.com', password: 'changeme' };
+    mockReq.body = { email: 'john@mail.com', password: 'changeme' };
     jest.spyOn(authService, 'loginUser').mockResolvedValue({
       access_token: 'fake.jwt.token',
-    } as { access_token: string });
+      cookieOptions: {} as LoginSuccess['cookieOptions'],
+    });
 
     await loginController(mockReq as Request<loginBody>, mockRes as Response);
 
@@ -77,10 +87,8 @@ describe('Auth Controller - loginUser', () => {
   });
 
   it('should return 401 for invalid credentials', async () => {
-    mockReq.body = { emailId: 'john@mail.com', password: 'wrong' };
-    jest.spyOn(authService, 'loginUser').mockResolvedValue({
-      access_token: '',
-    });
+    mockReq.body = { email: 'john@mail.com', password: 'wrong' };
+    jest.spyOn(authService, 'loginUser').mockResolvedValue(null);
 
     await loginController(mockReq as Request<loginBody>, mockRes as Response);
 

@@ -58,10 +58,12 @@ const { files, zipPath } = workerData as WorkerData;
       output.on('error', reject);
     });
 
+    // output.on('finish', () =>{
     parentPort?.postMessage({
       status: 'COMPLETED',
       progress: 100,
     });
+    // })
   } catch (error) {
     console.log('zipworkers ', error);
 

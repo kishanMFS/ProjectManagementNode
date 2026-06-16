@@ -4,6 +4,7 @@
     "outDir": "./dist",
     "rootDir": "./",
     "baseUrl": "./src",
+    "types": ["jest", "node"],
     "paths": {
       "@/*": ["*"]
     },
@@ -16,5 +17,12 @@
     "jest.env.ts",
     "/types/express.d.ts"
   ],
-  "exclude": ["dist", "node_modules"]
+  "exclude": [
+    "dist", 
+    "node_modules", 
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "**/_test_/**",
+    "dist"
+  ]
 }
