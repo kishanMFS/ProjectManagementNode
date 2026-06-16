@@ -2,8 +2,8 @@ import rateLimit from 'express-rate-limit';
 import env from '@/config/env.js';
 
 const isProd = env.isProd;
-let apiRateLimit = 10000;
-let authRateLimit = 10000;
+let apiRateLimit = 100000;
+let authRateLimit = 100000;
 
 if (isProd) {
   apiRateLimit = 100; // Max 100 requests per IP
