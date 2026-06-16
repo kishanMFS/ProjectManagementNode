@@ -41,7 +41,7 @@ src/
 
 ## Prerequisites
 
-- Node.js 18+
+- Node.js v25.8.1
 - npm
 - Database Server
 
@@ -50,7 +50,7 @@ src/
 Clone the repository:
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/kishanMFS/ProjectManagementNode.git
 cd ProjectManagementNode
 ```
 
@@ -101,13 +101,15 @@ import authRoutes from '@/routes/authRoutes';
 | POST | /api/auth/verify | Verify user |
 ### Projects
 
-| Method | Endpoint          | Description       |
-|--------|-------------------|-------------------|
-| GET    | /api/projects     | Get all projects  |
-| GET    | /api/projects/:id | Get project by ID |
-| POST   | /api/projects     | Create project    |
-| PUT    | /api/projects/:id | Update project    |
-| DELETE | /api/projects/:id | Delete project    |
+| Method | Endpoint                                  | Description       |
+|--------|-------------------------------------------|-------------------|
+| GET    | /api/projects                             | Get all projects  |
+| POST   | /:project_id/files                        | Upload files      |
+| POST   | /api/projects                             | Create project    |
+| POST   | /:project_id/jobs/zip                     | Create Zip        |
+| DELETE | /api/projects/:id                         | Delete project    |
+| GET    | /:project_id/jobs                         | Get Job Status    |
+| GET    | /:project_id/files/:fileName/download     | Download zip      |
 
 ## Error Handling
 
