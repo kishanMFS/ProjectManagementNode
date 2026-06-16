@@ -8,12 +8,15 @@ const db = pgp({
   connectionString: dbURL,
 });
 
-db.one('SELECT 1')
-  .then(() => {
+async function testConnection() {
+  try {
+    await db.one('SELECT 1');
     console.log('Database connection successful');
-  })
-  .catch((error) => {
+  } catch (error) {
     console.error('Database connection error:', error);
-  });
+  }
+}
+
+testConnection();
 
 export default db;
