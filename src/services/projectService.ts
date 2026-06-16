@@ -214,7 +214,13 @@ export const createZipService = async (
 
     let lastUpdatePromise: Promise<void> = Promise.resolve();
 
+    const cleanupListeners = () => {
+      worker.removeAllListeners();
+    };
+
     worker.on('message', (message) => {
+      // console.log('message:', message.status)
+
       lastUpdatePromise = lastUpdatePromise
         .then(async () => {
           await updateJobStatus(jobId, message.status, message.progress ?? 0);
@@ -225,16 +231,19 @@ export const createZipService = async (
     });
 
     worker.on('error', async (error) => {
-      console.log('Worker error:', error);
+      // console.log('Worker error:', error);
 
       await updateJobStatus(jobId, 'ERROR', 0, (error as Error).message);
+      cleanupListeners();
     });
 
     worker.on('exit', async (code) => {
-      console.log('Worker exit:', code);
+      // console.log('Worker exit:', code);
       if (code !== 0) {
         await updateJobStatus(jobId, 'FAILED', 0, `Worker exited with code ${code}`);
       }
+
+      cleanupListeners();
     });
   } catch (error) {
     result.success = false;
