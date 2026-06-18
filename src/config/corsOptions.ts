@@ -3,6 +3,7 @@ import { CorsOptions } from 'cors';
 const whitelist: string[] = [
   'http://localhost:5173',
   'http://localhost:4173',
+  'http://localhost',
   'https://project-management-react-pi.vercel.app',
 ];
 

@@ -11,7 +11,7 @@ if (isProd) {
 }
 
 export const apiRateLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: 1 * 60 * 1000, // 1 minute
   limit: apiRateLimit,
   standardHeaders: true,
   legacyHeaders: false,
