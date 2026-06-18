@@ -2,7 +2,7 @@
   "extends": "@tsconfig/node22/tsconfig.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./",
+    "rootDir": "./src",
     "baseUrl": "./src",
     "types": ["jest", "node"],
     "paths": {
@@ -14,9 +14,8 @@
   },
   "include": [
     "src/**/*.ts",
-    "_test_/**/*.ts",
-    "jest.config.ts",
-    "jest.env.ts",
+    "src/**/*",
+    
     "/types/express.d.ts"
   ],
   "exclude": [
