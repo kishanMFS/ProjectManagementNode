@@ -19,10 +19,10 @@ docker stop ContainerID
 docker start containerId
 
 - build image for apps
-docker build --no-cache-t node-app:1.0 . // -t = name:tag_name, . = indeicate cuurent dir from where this command runs to create image
+docker build --no-cache -t node-app:1.0 . // -t = name:tag_name, . = indeicate cuurent dir from where this command runs to create image
 
 - remove container
 docker rm containerId_or_name
 
 - run image for app
-docker run --no-cache -d -p 3002:3002 node-app:1.0 // host_port:container_port
+docker run -d -p 3002:3002 node-app:1.0 // host_port:container_port
