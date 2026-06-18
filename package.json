@@ -8,7 +8,7 @@
     "build": "tsc && tsc-alias",
     "dev": "tsx --watch src/server.ts",
     "lint": "eslint . --ext .ts,.tsx",
-    "prepare": "husky",
+    "prepare": "husky | true",
     "test": "jest"
   },
   "lint-staged": {
@@ -34,7 +34,8 @@
     "helmet": "^8.2.0",
     "http-status-codes": "^2.3.0",
     "multer": "^2.1.1",
-    "pg-promise": "^12.6.2"
+    "pg-promise": "^12.6.2",
+    "tsc-alias": "^1.8.17"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -59,7 +60,6 @@
     "ts-jest-resolver": "^2.0.1",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
-    "tsc-alias": "^1.8.17",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.58.0"
