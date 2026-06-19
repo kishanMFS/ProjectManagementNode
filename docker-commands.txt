@@ -29,4 +29,4 @@ docker run -d -p 3002:3002 node-app:1.0 // host_port:container_port
 
 
 - docker compose
-docker compose up --build
+docker compose up -d --build
