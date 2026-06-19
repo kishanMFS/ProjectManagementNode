@@ -15,6 +15,9 @@ services:
 
     ports:
       - "3002:3002"
+      
+    env_file:
+      - ./ProjectManagementNode/.env.production
 
     environment:
       DB_HOST: postgres
