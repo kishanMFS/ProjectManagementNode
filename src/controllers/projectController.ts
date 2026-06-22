@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 import * as projectService from '@/services/projectService.js';
 // import type { Project } from '@/types/projectTypes.js';
 import env from '@/config/env.js';
+import logger from '@/utils/winston.js';
 
 const isProd = env.isProd;
 
@@ -10,6 +11,10 @@ export const createProject = async (req: Request, res: Response): Promise<void> 
     const createProjectResult = await projectService.createProjectService(req.body);
     res.status(201).json(createProjectResult);
   } catch (error) {
+    logger.error('Error creating project', {
+      message: error instanceof Error ? error.message : String(error),
+      body: req.body,
+    });
     res.status(500).json({ message: 'Error creating project', error });
   }
 };
@@ -21,6 +26,11 @@ export const getProjects = async (req: Request, res: Response): Promise<void> =>
     res.status(200).json(getProjectsResult);
   } catch (error: unknown) {
     let errorMessage = 'Error fetching projects';
+    logger.error(errorMessage, {
+      message: error instanceof Error ? error.message : String(error),
+      // stack: error instanceof Error ? error.stack : undefined,
+      body: req.body,
+    });
     if (!isProd) {
       errorMessage = (error as Error).message;
     }
@@ -40,6 +50,11 @@ export const getProjectById = async (req: Request, res: Response): Promise<void>
     res.status(200).json(project);
   } catch (error: unknown) {
     let errorMessage = 'Error fetching project';
+    logger.error(errorMessage, {
+      message: error instanceof Error ? error.message : String(error),
+      // stack: error instanceof Error ? error.stack : undefined,
+      body: req.body,
+    });
     if (!isProd) {
       errorMessage = (error as Error).message;
     }
@@ -60,6 +75,11 @@ export const updateProject = async (req: Request, res: Response): Promise<void> 
     res.status(200).json(project);
   } catch (error: unknown) {
     let errorMessage = 'Error updating project';
+    logger.error(errorMessage, {
+      message: error instanceof Error ? error.message : String(error),
+      // stack: error instanceof Error ? error.stack : undefined,
+      body: req.body,
+    });
     if (!isProd) {
       errorMessage = (error as Error).message;
     }
@@ -80,6 +100,11 @@ export const deleteProject = async (req: Request, res: Response): Promise<void> 
     res.status(200).json(project);
   } catch (error: unknown) {
     let errorMessage = 'Error deleting project';
+    logger.error(errorMessage, {
+      message: error instanceof Error ? error.message : String(error),
+      // stack: error instanceof Error ? error.stack : undefined,
+      body: req.body,
+    });
     if (!isProd) {
       errorMessage = (error as Error).message;
     }
@@ -101,6 +126,11 @@ export const getProjectFiles = async (req: Request, res: Response): Promise<void
     res.status(200).json(projectFiles);
   } catch (error: unknown) {
     let errorMessage = 'Error getting project files';
+    logger.error(errorMessage, {
+      message: error instanceof Error ? error.message : String(error),
+      // stack: error instanceof Error ? error.stack : undefined,
+      body: req.body,
+    });
     if (!isProd) {
       errorMessage = (error as Error).message;
     }
@@ -123,6 +153,11 @@ export const uploadFilesToProject = async (req: Request, res: Response): Promise
     res.status(200).json(projectFiles);
   } catch (error: unknown) {
     let errorMessage = 'Error getting project files';
+    logger.error(errorMessage, {
+      message: error instanceof Error ? error.message : String(error),
+      // stack: error instanceof Error ? error.stack : undefined,
+      body: req.body,
+    });
     if (!isProd) {
       errorMessage = (error as Error).message;
     }
@@ -145,6 +180,11 @@ export const deleteProjectFiles = async (req: Request, res: Response): Promise<v
     res.status(200).json(response);
   } catch (error: unknown) {
     let errorMessage = 'Error getting project files';
+    logger.error(errorMessage, {
+      message: error instanceof Error ? error.message : String(error),
+      // stack: error instanceof Error ? error.stack : undefined,
+      body: req.body,
+    });
     if (!isProd) {
       errorMessage = (error as Error).message;
     }
@@ -166,6 +206,11 @@ export const createZip = async (req: Request, res: Response): Promise<void> => {
     res.status(200).json(response);
   } catch (error: unknown) {
     let errorMessage = 'Error getting project files';
+    logger.error(errorMessage, {
+      message: error instanceof Error ? error.message : String(error),
+      // stack: error instanceof Error ? error.stack : undefined,
+      body: req.body,
+    });
     if (!isProd) {
       errorMessage = (error as Error).message;
     }
@@ -186,6 +231,11 @@ export const getJobsStatus = async (req: Request, res: Response): Promise<void> 
     res.status(200).json(response);
   } catch (error: unknown) {
     let errorMessage = 'Error getting project jobs';
+    logger.error(errorMessage, {
+      message: error instanceof Error ? error.message : String(error),
+      // stack: error instanceof Error ? error.stack : undefined,
+      body: req.body,
+    });
     if (!isProd) {
       errorMessage = (error as Error).message;
     }
